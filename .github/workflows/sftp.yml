@@ -1,0 +1,52 @@
+name: SFTP Workflow
+
+on:
+  workflow_call:
+    inputs:
+      direction:
+        required: true
+        type: string
+        description: "upload or download"
+      localPath:
+        required: true
+        type: string
+        description: "Local file or folder path"
+      remotePath:
+        required: true
+        type: string
+        description: "Remote file or folder path"
+    secrets:
+      SFTP_HOST:
+        required: true
+      SFTP_USER:
+        required: true
+      SFTP_PRIVATE_KEY:
+        required: true
+
+jobs:
+  sftp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install lftp and setup SSH
+        run: |
+          sudo apt-get update && sudo apt-get install -y lftp
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SFTP_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SFTP_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Run SFTP Action
+        run: |
+          if [ "${{ inputs.direction }}" = "upload" ]; then
+            lftp -e "set sftp:connect-program 'ssh -i ~/.ssh/id_rsa'; put -O $(dirname ${{ inputs.remotePath }}) ${{ inputs.localPath }}; bye" \
+              -u ${{ secrets.SFTP_USER }}, sftp://${{ secrets.SFTP_HOST }}
+          elif [ "${{ inputs.direction }}" = "download" ]; then
+            lftp -e "set sftp:connect-program 'ssh -i ~/.ssh/id_rsa'; get ${{ inputs.remotePath }} -o ${{ inputs.localPath }}; bye" \
+              -u ${{ secrets.SFTP_USER }}, sftp://${{ secrets.SFTP_HOST }}
+          else
+            echo "Invalid direction: must be 'upload' or 'download'"
+            exit 1
+          fi
