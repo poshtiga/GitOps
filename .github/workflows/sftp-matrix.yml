@@ -1,0 +1,41 @@
+name: SFTP Batch Transfers
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * *" # run every day at 03:00 UTC
+
+jobs:
+  sftp-matrix:
+    uses: ./.github/workflows/sftp.yml
+    with:
+      direction: ${{ matrix.job.direction }}
+      localPath: ${{ matrix.job.localPath }}
+      remotePath: ${{ matrix.job.remotePath }}
+    secrets:
+      SFTP_HOST: ${{ secrets.SFTP_HOST }}
+      SFTP_USER: ${{ secrets.SFTP_USER }}
+      SFTP_PRIVATE_KEY: ${{ secrets.SFTP_PRIVATE_KEY }}
+    strategy:
+      matrix:
+        job:
+          - direction: upload
+            localPath: ./data/report.csv
+            remotePath: /incoming/report.csv
+          - direction: download
+            localPath: ./downloads/daily_extract.csv
+            remotePath: /outgoing/daily_extract.csv
+
+  notify-slack:
+    runs-on: ubuntu-latest
+    needs: [sftp-matrix]
+    if: failure()   # only run if SFTP job(s) failed
+    steps:
+      - name: Send Slack notification
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{
+              \"text\": \":x: SFTP Workflow FAILED in repo *${{ github.repository }}* on *${{ github.ref }}*.
+              Check logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+            }" \
+            ${{ secrets.SLACK_WEBHOOK_URL }}
