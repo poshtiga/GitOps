@@ -24,4 +24,8 @@ Handy GitOps practices and workflows
   SFTP_USER → username
   SFTP_PRIVATE_KEY → contents of private key (sftp_gh_key)
 
+# (Optional) Test workflow locally
+ - Use act to spin up a local Docker container and execute your workflow using the secrets in .secrets file locally
+ - See sftp-test-workflows-local.sh for sample commands
+
 
