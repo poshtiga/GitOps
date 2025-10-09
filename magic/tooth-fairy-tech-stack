@@ -1,0 +1,104 @@
+name: ToothFairyTechStack 🦷✨
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  conjure:
+    name: Summon the Spellbook
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🪄 Checkout source code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Inspect for missing teeth (lint)
+        run: |
+          echo "Running code linting..."
+          # Replace with actual linter command
+          echo "🧹 All clean. No cavities found."
+
+      - name: 🧪 Brew a potion (tests)
+        run: |
+          echo "Casting unit tests..."
+          # Replace with actual test command
+          echo "✅ Tests passed. Tooth integrity confirmed."
+
+      - name: 🐇 Pull rabbit from hat (build)
+        run: |
+          echo "Building magical artifact..."
+          # Replace with actual build command
+          echo "🏗️ Build complete. Tooth fairy approved."
+
+      - name: 🪙 Leave coin under pillow (deploy)
+        if: success()
+        run: |
+          echo "Deploying to enchanted realm..."
+          # Replace with actual deploy command
+          echo "🚀 Deployment successful. Coin placed."
+
+      - name: 📜 Archive spellbook
+        uses: actions/upload-artifact@v4
+        with:
+          name: enchanted-artifacts
+          path: |
+            ./build/
+            ./logs/
+name: Rabbit Reveal 🐇🎩
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prepare-stage:
+    name: Set the Stage
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🧼 Sweep the stage
+        run: echo "Stage cleaned. No carrots left behind."
+
+      - name: 🎩 Place the hat
+        run: echo "Hat positioned center stage. Audience holding breath."
+
+  summon-rabbit:
+    name: Pull Rabbit from Hat
+    needs: prepare-stage
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔐 Check magic word
+        run: |
+          if [ "${{ secrets.MAGIC_WORD }}" != "abracadabra" ]; then
+            echo "🛑 Incorrect magic word. Rabbit refuses to appear."
+            exit 1
+          fi
+          echo "✅ Magic word accepted. Proceeding with summoning..."
+
+      - name: 🪄 Whisper incantation
+        run: |
+          echo "Abracadabra..."
+          sleep 2
+          echo "✨✨✨"
+
+      - name: 🐇 Reveal rabbit
+        run: |
+          echo "Rabbit successfully pulled from hat!"
+          echo "🐇 says hello."
+
+      - name: 📸 Take bow
+        run: echo "Magician bows. Rabbit waves paw."
+
+  cleanup:
+    name: Vanish Evidence
+    needs: summon-rabbit
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🧹 Hide the wand
+        run: echo "Wand hidden behind curtain."
+
+      - name: 🕳️ Close trapdoor
+        run: echo "Trapdoor sealed. Secrets safe."
+
+      - name: 📝 Log applause
+        run: echo "Audience claps. One child asks if rabbit is real."
