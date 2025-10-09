@@ -1,0 +1,56 @@
+name: Rabbit Reveal 🐇🎩
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prepare-stage:
+    name: Set the Stage
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🧼 Sweep the stage
+        run: echo "Stage cleaned. No carrots left behind."
+
+      - name: 🎩 Place the hat
+        run: echo "Hat positioned center stage. Audience holding breath."
+
+  summon-rabbit:
+    name: Pull Rabbit from Hat
+    needs: prepare-stage
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔐 Check magic word
+        run: |
+          if [ "${{ secrets.MAGIC_WORD }}" != "abracadabra" ]; then
+            echo "🛑 Incorrect magic word. Rabbit refuses to appear."
+            exit 1
+          fi
+          echo "✅ Magic word accepted. Proceeding with summoning..."
+
+      - name: 🪄 Whisper incantation
+        run: |
+          echo "Abracadabra..."
+          sleep 2
+          echo "✨✨✨"
+
+      - name: 🐇 Reveal rabbit
+        run: |
+          echo "Rabbit successfully pulled from hat!"
+          echo "🐇 says hello."
+
+      - name: 📸 Take bow
+        run: echo "Magician bows. Rabbit waves paw."
+
+  cleanup:
+    name: Vanish Evidence
+    needs: summon-rabbit
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🧹 Hide the wand
+        run: echo "Wand hidden behind curtain."
+
+      - name: 🕳️ Close trapdoor
+        run: echo "Trapdoor sealed. Secrets safe."
+
+      - name: 📝 Log applause
+        run: echo "Audience claps. One child asks if rabbit is real."
