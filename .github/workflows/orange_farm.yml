@@ -1,0 +1,68 @@
+name: Orange Farm Monitor
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # every 6 hours
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install kubernetes pandas matplotlib jupyter nbconvert
+
+      - name: Run Jupyter notebook
+        run: |
+          jupyter nbconvert --execute orange-farm-cluster/monitor_orange_farm.ipynb \
+            --to html --output orange_farm_report.html
+
+      - name: Extract summary from notebook
+        run: |
+          echo "🌤️  Checking orchard health..." > summary.txt
+          python - <<'EOF'
+          from kubernetes import client, config
+          import datetime
+
+          config.load_kube_config()
+          v1 = client.CoreV1Api()
+          pods = v1.list_pod_for_all_namespaces(watch=False)
+
+          total = len(pods.items)
+          healthy = sum(1 for p in pods.items if p.status.phase == "Running")
+          timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+
+          summary = f"🌤️  {healthy}/{total} pods are running happily in the orchard!\nLast updated: {timestamp}\n"
+          print(summary)
+          with open("summary.txt", "w") as f:
+              f.write(summary)
+          EOF
+
+      - name: Update README with new summary
+        run: |
+          # Remove previous summary section (if exists)
+          sed -i '/<!-- ORCHARD_STATUS_START -->/,/<!-- ORCHARD_STATUS_END -->/d' README.md
+
+          # Add updated status
+          echo '<!-- ORCHARD_STATUS_START -->' >> README.md
+          cat summary.txt >> README.md
+          echo '<!-- ORCHARD_STATUS_END -->' >> README.md
+
+      - name: Commit and push report
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add README.md orange_farm_report.html
+          git commit -m "Update orchard report [skip ci]" || echo "No changes to commit"
+          git push
