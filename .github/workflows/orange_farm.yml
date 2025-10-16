@@ -29,38 +29,10 @@ jobs:
           export MODE=${{ github.event.inputs.mode }}
           jupyter nbconvert --to notebook --execute orange-farm-cluster/monitor_orange_farm.ipynb --output executed_monitor_orange_farm.ipynb
 
-      - name: Commit and push summary
-        run: |
-          git config user.name "poshtiga"
-          git config user.email "techstoriesdotcom@gmail.com"
-          git add orange-farm-cluster/summary.txt
-          git commit -m "Update orchard report [skip ci]" || echo "No changes to commit"
-          git push
-          
-      - name: Extract summary from notebook
-        run: |
-          if [ -f summary.txt ]; then
-            echo "Summary produced by notebook:"
-            cat summary.txt
-          else
-            echo "⚠️ summary.txt not found — notebook may have failed or used different path."
-            exit 0
-          fi
-
-      - name: Update README with new summary
-        run: |
-          # Remove previous summary section (if exists)
-          sed -i '/<!-- ORCHARD_STATUS_START -->/,/<!-- ORCHARD_STATUS_END -->/d' README.md
-
-          # Add updated status
-          echo '<!-- ORCHARD_STATUS_START -->' >> README.md
-          cat summary.txt >> README.md
-          echo '<!-- ORCHARD_STATUS_END -->' >> README.md
-
-      - name: Commit and push report
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add README.md orange_farm_report.html
-          git commit -m "Update orchard report [skip ci]" || echo "No changes to commit"
-          git push
+      - name: Upload summary and plots
+        uses: actions/upload-artifact@v3
+        with:
+          name: orchard-report
+          path: |
+            orange-farm-cluster/summary.txt
+            orange-farm-cluster/*.png
