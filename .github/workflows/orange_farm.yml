@@ -23,11 +23,11 @@ jobs:
 
       - name: Install dependencies
         run: pip install kubernetes pandas matplotlib jupyter nbconvert
-
-      - name: Run Jupyter notebook
+      
+      - name: Run Jupyter notebook (Orange Farm)
         run: |
-          jupyter nbconvert --execute orange-farm-cluster/monitor_orange_farm.ipynb \
-            --to html --output orange_farm_report.html
+          export MODE=${{ github.event.inputs.mode }}
+          jupyter nbconvert --to notebook --execute orange-farm-cluster/monitor_orange_farm.ipynb --output executed_monitor_orange_farm.ipynb
 
       - name: Extract summary from notebook
         run: |
