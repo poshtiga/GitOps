@@ -33,7 +33,7 @@ jobs:
         run: |
           git config user.name "poshtiga"
           git config user.email "techstoriesdotcom@gmail.com"
-          git add summary.txt
+          git add orange-farm-cluster/summary.txt
           git commit -m "Update orchard report [skip ci]" || echo "No changes to commit"
           git push
           
