@@ -30,7 +30,7 @@ jobs:
           jupyter nbconvert --to notebook --execute orange-farm-cluster/monitor_orange_farm.ipynb --output executed_monitor_orange_farm.ipynb
 
       - name: Upload summary and plots
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: orchard-report
           path: |
