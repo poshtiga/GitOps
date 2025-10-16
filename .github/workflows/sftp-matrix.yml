@@ -2,8 +2,6 @@ name: SFTP Batch Transfers
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 3 * * *" # run every day at 03:00 UTC
 
 jobs:
   sftp-matrix:
