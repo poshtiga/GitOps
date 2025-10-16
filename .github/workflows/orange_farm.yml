@@ -31,24 +31,13 @@ jobs:
 
       - name: Extract summary from notebook
         run: |
-          echo "🌤️  Checking orchard health..." > summary.txt
-          python - <<'EOF'
-          from kubernetes import client, config
-          import datetime
-
-          config.load_kube_config()
-          v1 = client.CoreV1Api()
-          pods = v1.list_pod_for_all_namespaces(watch=False)
-
-          total = len(pods.items)
-          healthy = sum(1 for p in pods.items if p.status.phase == "Running")
-          timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
-
-          summary = f"🌤️  {healthy}/{total} pods are running happily in the orchard!\nLast updated: {timestamp}\n"
-          print(summary)
-          with open("summary.txt", "w") as f:
-              f.write(summary)
-          EOF
+          if [ -f summary.txt ]; then
+            echo "Summary produced by notebook:"
+            cat summary.txt
+          else
+            echo "⚠️ summary.txt not found — notebook may have failed or used different path."
+            exit 0
+          fi
 
       - name: Update README with new summary
         run: |
