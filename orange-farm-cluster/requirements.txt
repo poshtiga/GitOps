@@ -1,0 +1,5 @@
+kubernetes
+pandas
+matplotlib
+jupyter
+nbconvert
