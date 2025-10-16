@@ -2,8 +2,11 @@ name: Orange Farm Monitor
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
+    inputs:
+      mode:
+        description: "Run mode (mock or real)"
+        required: true
+        default: "mock"
 
 jobs:
   monitor:
